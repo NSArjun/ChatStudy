@@ -35,7 +35,7 @@ Client-server chat applications are software systems that enable real-time commu
 •	For security and privacy, chat applications often implement user authentication mechanisms.
 •	Users are required to provide credentials (e.g., username and password) to access the chat system.
 •	More advanced methods like tokens or secure protocols can enhance authentication.
-5. Message Routing:
+## 5. Message Routing:
 •	The server is responsible for routing messages from one client to another.
 •	It ensures that messages are delivered to the intended recipients.
 •	Message routing may involve maintaining a list of connected users and their associated sockets.
@@ -73,72 +73,64 @@ Client-server chat applications are versatile tools that facilitate real-time co
 
 Client-server chat applications are foundational to real-time communication over networks. They incorporate principles of socket programming, communication protocols, and security mechanisms to provide a seamless user experience. Understanding the basics of client-server chat applications is essential for developers involved in networked application development, as they form the backbone of various collaborative communication systems. As technology evolves, chat applications continue to adapt, incorporating new features and technologies to enhance user interaction and connectivity.
 
-## Program:
-
-### Server:
+## PROGRAM:
+### client:
 ```python
+
 import socket
 
-def server_program():
-    # get the hostname
-    host = socket.gethostname()
-    port = 5000  # initiate port no above 1024
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    server_socket = socket.socket()  # get instance
-    # look closely. The bind() function takes tuple as argument
-    server_socket.bind((host, port))  # bind host address and port together
+client.connect(("localhost", 9999))
 
-    # configure how many client the server can listen simultaneously
-    server_socket.listen(2)
-    conn, address = server_socket.accept()  # accept new connection
-    print("Connection from: " + str(address))
-    while True:
-        # receive data stream. it won't accept data packet greater than 1024 bytes
-        data = conn.recv(1024).decode()
-        if not data:
-            # if data is not received break
-            break
-        print("from connected user: " + str(data))
-        data = input(' -> ')
-        conn.send(data.encode())  # send data to the client
+done=False
 
-    conn.close()  # close the connection
+while not done:
+    client.send(input("Message ").encode('utf-8'))
+    msg = client.recv(1024).decode('utf-8')
+
+    if msg == 'quit':
+        done=True
+    else:
+        print(msg)
 
 
-if __name__ == '__main__':
-    server_program()
+
+client.close()
+
 ```
-
-### Client:
+### server
 ```python
 import socket
+from base64 import decode
+from operator import truediv
 
-def client_program():
-    host = socket.gethostname()  # as both code is running on same pc
-    port = 5000  # socket server port number
+server =socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(('localhost', 9999))
+server.listen()
+client,addr=server.accept()
 
-    client_socket = socket.socket()  # instantiate
-    client_socket.connect((host, port))  # connect to the server
+done = False
 
-    message = input(" -> ")  # take input
+while not done:
+    msg = client.recv(1024).decode('utf-8')
 
-    while message.lower().strip() != 'bye':
-        client_socket.send(message.encode())  # send message
-        data = client_socket.recv(1024).decode()  # receive response
+    if msg == 'quit':
+        done = True
+    else:
+        print(msg)
 
-        print('Received from server: ' + data)  # show in terminal
-
-        message = input(" -> ")  # again take input
-
-    client_socket.close()  # close the connection
+    client.send(input("Message ").encode('utf-8'))
 
 
-if __name__ == '__main__':
-    client_program()
+client.close()
+server.close()
 ```
 
-## Output:
-![alt text](image.png)
+## OUTPUT:
+![image](https://github.com/user-attachments/assets/3387a89a-890f-4322-900f-9aed4ceee866)
+
+
 
 ## Result:
 
